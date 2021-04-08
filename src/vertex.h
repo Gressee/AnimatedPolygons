@@ -1,23 +1,41 @@
 #ifndef VERTEX_H_
 #define VERTEX_H_
 
-// Standard stuff
-#include <iostream>
+#include <stdlib.h>
+#include <math.h>
+#include "config.h"
 
-// OpenGL and SDL
-#include <GL/glew.h>
 
+// Struct that is jused by opengl to draw
 typedef struct {
-    // Position
+    // Pos
     float x;
     float y;
-
+    
     // Color
-    //float r;
-    //float g;
-    //float b;
-    //float a;
+    float r;
+    float g;
+    float b;
+    float a;
+} DrawVertex;
 
-} Vertex;
+
+// Class that is used for the animation with 
+class AnimationVertex {
+public:
+    float x;
+    float y;
+    float dir;  // in RAD
+    float speed;
+    AnimationVertex * nearest[VERTEX_CONNECTIONS];  
+
+    AnimationVertex();
+    void step(void);
+    void getNearest(AnimationVertex * vertecies);
+    float distToVertex(AnimationVertex * vertex);
+
+
+};
+
 
 #endif

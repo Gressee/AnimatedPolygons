@@ -10,9 +10,7 @@
 // Local Includes
 #include "color.h"
 #include "config.h"
-#include "defines.h"
 #include "draw.h"
-#include "points.h"
 #include "shader.h"
 #include "vertex_buffer.h"
 #include "vertex.h"
@@ -37,7 +35,7 @@ int main() {
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
     // Create window
-    window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_OPENGL);
+    window = SDL_CreateWindow("Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, screenWidth, screenHeight, SDL_WINDOW_OPENGL);
     SDL_GLContext glContext = SDL_GL_CreateContext(window);
 
     // Init GLEW
@@ -48,17 +46,11 @@ int main() {
     }
 
 
-    ////// ANIMATION //////
+    //// ANIMATION ////
+    
+    // Ceate animation vertecies
+    AnimationVertex animVertecies[vertexNum];
 
-    // Animation variables
-    float animationTime = 0.0;
-
-    // Create the point
-    Point * points;
-    points = (Point *) malloc(POINTS_NUM * sizeof(Point));
-    for (int i = 0; i < POINTS_NUM; i++) {
-        points[i] = Point(0.1f*(float)i, 0.1f*(float)i, 1.0f + (float)i);
-    }
 
     // Main Loop
     bool run = true;
@@ -75,14 +67,20 @@ int main() {
         
         //// ANIMATION ////
 
-        // Update point position
-        for (int i = 0; i < POINTS_NUM; i++) points[i].step();
+        // Move vertecies
+        for (int i = 0; i < vertexNum; i++) {
+            animVertecies[i].step();
+        }
 
-        // Update nearest points
+        // Check the nearest vertecies
+        for (int i = 0; i < vertexNum; i++) {
+            animVertecies[i].getNearest(animVertecies);
+        }
 
 
         //// GRAPHICS ////
 
+        // Clear
         glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -91,7 +89,9 @@ int main() {
         // Draw Lines
 
         // Draw points
-        drawPoints(points);
+        for (int i = 0; i < vertexNum; i++) {
+            drawCircle(animVertecies[i].x, animVertecies[i].y, 0.001);
+        }
 
         // Show the drawn screen
         SDL_GL_SwapWindow(window);

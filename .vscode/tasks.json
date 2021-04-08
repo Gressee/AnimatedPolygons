@@ -10,9 +10,10 @@
                 
                 "${workspaceFolder}/src/main.cpp",
                 "${workspaceFolder}/src/color.cpp",
+                "${workspaceFolder}/src/config.cpp",
                 "${workspaceFolder}/src/draw.cpp",
-                "${workspaceFolder}/src/points.cpp",
                 "${workspaceFolder}/src/shader.cpp",
+                "${workspaceFolder}/src/vertex.cpp",
                 
                 "-lm",
                 "-lGL",

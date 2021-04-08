@@ -1,7 +1,14 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
-int screenWidth = 1600;
-int screenHeight = 900;
+// Screen
+extern int screenWidth;
+extern int screenHeight;
+
+// Animation
+extern const int vertexNum;
+
+// Conecttions a vertex has
+#define VERTEX_CONNECTIONS 2
 
 #endif
