@@ -27,7 +27,11 @@ public:
     float y;
     float dir;  // in RAD
     float speed;
-    AnimationVertex * nearest[VERTEX_CONNECTIONS];  
+    float radius; 
+    int nearest[POLY_COUNT - 1];  // Stores the arrayIndexes of the nearest
+
+    // The index where this Vertex is in the animVertecies array
+    int arrayIndex = 0;  
 
     AnimationVertex();
     void step(void);

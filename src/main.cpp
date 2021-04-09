@@ -12,7 +12,7 @@
 #include "config.h"
 #include "draw.h"
 #include "shader.h"
-#include "vertex_buffer.h"
+#include "buffer.h"
 #include "vertex.h"
 
 using namespace std;
@@ -45,12 +45,17 @@ int main() {
         return -1;
     }
 
+    // Define Shaders
+    Shader shader("shader/basic.vs", "shader/basic.fs");
+    shader.bind();
 
     //// ANIMATION ////
     
     // Ceate animation vertecies
-    AnimationVertex animVertecies[vertexNum];
+    AnimationVertex animVertecies[animVertexNum];
 
+    // Set the arrayIndex of the Vertecies
+    for (int i = 0; i < animVertexNum; i++) animVertecies[i].arrayIndex = i;
 
     // Main Loop
     bool run = true;
@@ -68,12 +73,12 @@ int main() {
         //// ANIMATION ////
 
         // Move vertecies
-        for (int i = 0; i < vertexNum; i++) {
+        for (int i = 0; i < animVertexNum; i++) {
             animVertecies[i].step();
         }
 
         // Check the nearest vertecies
-        for (int i = 0; i < vertexNum; i++) {
+        for (int i = 0; i < animVertexNum; i++) {
             animVertecies[i].getNearest(animVertecies);
         }
 
@@ -85,13 +90,12 @@ int main() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         // Draw polygons
-
+        drawPolygons(animVertecies);
         // Draw Lines
 
         // Draw points
-        for (int i = 0; i < vertexNum; i++) {
-            drawCircle(animVertecies[i].x, animVertecies[i].y, 0.001);
-        }
+        drawVertexCirles(animVertecies);
+
 
         // Show the drawn screen
         SDL_GL_SwapWindow(window);

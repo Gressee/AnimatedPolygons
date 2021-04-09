@@ -10,34 +10,48 @@ using namespace std;
 
 // Constructor
 AnimationVertex::AnimationVertex(void) {
-    // Set random values as start 
-    x = (float)(rand() % 200 -100) / 100;
-    y = (float)(rand() % 200 -100) / 100;
-    dir = (float)(rand() % 628) / 100;    
+
+    // Set random values as start (in Room coords)
+    x = (float)(rand() % roomWidth);
+    y = (float)(rand() % roomHeight);
+    dir = (float)(rand() % 628) / 100;
+
+    // Set radius
+    radius = 7;  
     
-    // Fille the nearest array with NULL pointers
-    for (int i = 0; i < VERTEX_CONNECTIONS; i++) {
-        nearest[i] = NULL;
+    // Fille the nearest array with -1 (= not set yet)
+    for (int i = 0; i < POLY_COUNT - 1; i++) {
+        nearest[i] = -1;
     }
 }
 
 // Move the Vertex one frame
 void AnimationVertex::step(void) {
+
+    // Handle the bounce at the edges
+    if (x > roomWidth) dir = clampAngle(M_PI - dir);
+    if (x < 0) dir = clampAngle(M_PI - dir);
+    if (y > roomHeight) dir = clampAngle(-dir);
+    if (y < 0) dir = clampAngle(-dir);
+
+    // Move 
     x += cos(dir);
     y += sin(dir);
+
 }
 
 // Get the 3 nearest vertecies
-void AnimationVertex::getNearest(AnimationVertex * vertecies) {
-    for (int i = 0; i < vertexNum; i++) {
+void AnimationVertex::getNearest(AnimationVertex * animVertecies) {
+
+    for (int i = 0; i < animVertexNum; i++) {
         // Exit if its this vertex
-        if (vertecies[i].x == x && vertecies[i].y == y) continue;
+        if (animVertecies[i].x == x && animVertecies[i].y == y) continue;
 
         // If nearest contains a NULL pointer put it in that spot
         bool setNearest = false;
-        for (int j = 0; j < VERTEX_CONNECTIONS; j++) {
-            if (nearest[j] == NULL) {
-                nearest[j] = &vertecies[i];
+        for (int j = 0; j < POLY_COUNT - 1; j++) {
+            if (nearest[j] == -1) {
+                nearest[j] = animVertecies[i].arrayIndex;
                 setNearest = true;
                 break;
             }
@@ -50,9 +64,9 @@ void AnimationVertex::getNearest(AnimationVertex * vertecies) {
         
         // Get the index with the farest vertex in nearest
         int farestIndex = 0;
-        float farestDist = distToVertex(nearest[0]);
-        for (int j = 0; j < VERTEX_CONNECTIONS; j ++) {
-            float testDist = distToVertex(nearest[j]); 
+        float farestDist = distToVertex(&animVertecies[nearest[0]]);
+        for (int j = 0; j < POLY_COUNT - 1; j ++) {
+            float testDist = distToVertex(&animVertecies[nearest[j]]); 
             if (testDist > farestDist) {
                 farestDist = testDist;
                 farestIndex = j;
@@ -65,9 +79,9 @@ void AnimationVertex::getNearest(AnimationVertex * vertecies) {
             replaced
         */
 
-        float dist = distToVertex(&vertecies[i]);
+        float dist = distToVertex(&animVertecies[i]);
         if (dist < farestDist) {
-            nearest[farestIndex] = &vertecies[i];
+            nearest[farestIndex] = animVertecies[i].arrayIndex;
         }
     }
 }

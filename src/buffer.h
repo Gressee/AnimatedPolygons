@@ -1,5 +1,5 @@
-#ifndef VERTEX_BUFFER_H_
-#define VERTEX_BUFFER_H_
+#ifndef BUFFER_H_
+#define BUFFER_H_
 
 
 #include <GL/glew.h>
@@ -12,7 +12,7 @@ public:
     GLuint vao;
 
 
-    VertexBuffer(void* data, uint32_t numVertices) {
+    VertexBuffer(void * data, int numVertices) {
         glGenVertexArrays(1, &vao);
         glBindVertexArray(vao);
 
@@ -26,7 +26,7 @@ public:
 
         // Color Attribute
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(DrawVertex), (void *) offsetof(DrawVertex, x));
+        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(DrawVertex), (void *) offsetof(DrawVertex, r));
 
     }
 
@@ -43,5 +43,35 @@ public:
     }
 };
 
+
+class IndexBuffer {
+private:
+    GLuint bufferId;
+
+public:
+
+    IndexBuffer(void * data, int numIndices, int elementSize) {
+        
+        glGenBuffers(1, &bufferId);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, numIndices * elementSize, data, GL_STATIC_DRAW);
+
+    }
+
+    virtual ~IndexBuffer() {
+        glDeleteBuffers(1, &bufferId);
+    }
+
+    void bind() {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferId);
+    }
+
+    void unbind() {
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    }
+
+    
+
+};
 
 #endif
