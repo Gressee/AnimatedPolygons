@@ -6,6 +6,53 @@
 #include "vertex.h"
 #include "buffer.h"
 
+
+int polygonExists(indexType * indices, int indicesNum, indexType * newIndices) {
+	
+	int i, j, k, l;
+
+	int polygonExists = 0;
+
+	bool inArray[POLY_COUNT];	
+	for (l = 0; l < POLY_COUNT; l++) {
+		inArray[l] = false;
+	}
+
+	// Go through every triangle and compare with the new one
+	bool sameArray = true;
+	for (i = 0; i < indicesNum; i += POLY_COUNT) {
+		
+		for (l = 0; l < POLY_COUNT; l++) {
+			inArray[l] = false;
+		}
+		
+		// Compare two Polygons
+		for (j = 0; j < POLY_COUNT; j++) {
+			
+			for (k = 0; k < POLY_COUNT; k++){
+				if (indices[i+j] == newIndices[k]){
+					inArray[j] = true;
+				}
+			}
+
+		}
+		
+		sameArray = true;
+		for (l = 0; l < POLY_COUNT; l++) {
+			if (inArray[l] == false) sameArray = false;
+		}
+		
+		if (sameArray == true) {
+			polygonExists = 1;
+		}
+		
+	}
+
+	return polygonExists;
+}
+
+
+
 // Draws a filled circle around every vertex
 void drawVertexCirles(AnimationVertex * animVertecies) {
 
@@ -96,17 +143,19 @@ void drawVertexCirles(AnimationVertex * animVertecies) {
 
 // Draw all the Polygons
 void drawPolygons(AnimationVertex * animVertecies)  {
+	
+	int exists = 0;
+
 	int drawVerteciesNum = 0;
 	int indicesNum = 0;
-
+	std::cout << "Reach -1" << std::endl;
 	indexType * indices = (indexType *) malloc(sizeof(indexType));
-
+	std::cout << "Reach 0" << std::endl;
 	// Make Draw Vertecies from the animVertecies
-	float color;
+	float color = 0.5f;
 	drawVerteciesNum = animVertexNum;
 	DrawVertex * drawVertecies = (DrawVertex *) malloc(drawVerteciesNum * sizeof(DrawVertex));
 	for (int i = 0; i <  animVertexNum; i++) {
-		color = (float)(rand() % 100) / 100.0f;
 		drawVertecies[i] = {
 			convertX(animVertecies[i].x),
 			convertY(animVertecies[i].y),
@@ -124,22 +173,31 @@ void drawPolygons(AnimationVertex * animVertecies)  {
 			the polygons are all trinagles
 		*/
 
-		// Update Count
-		indicesNum += 3;
+		// Get the new possible indices
+		indexType newIndices[POLY_COUNT];
+		newIndices[0] = (indexType)animVertecies[i].arrayIndex;
+		for (int j = 0; j < POLY_COUNT -1; j++)
+			newIndices[j+1] = (indexType)animVertecies[i].nearest[j];
 
-		// Allocate new memory
-		indices = (indexType *) realloc(indices, indicesNum * sizeof(indexType));
-
-		int i1 = animVertecies[i].arrayIndex;
-		int i2 = animVertecies[i].nearest[0];
-		int i3 = animVertecies[i].nearest[1];
-
-		indices[i*3 + 0] = animVertecies[i].arrayIndex;
-		indices[i*3 + 1] = animVertecies[i].nearest[0];
-		indices[i*3 + 2] = animVertecies[i].nearest[1];
-
+		// Check if this polygon exists already
+		exists = polygonExists(indices, indicesNum, newIndices); 
+		std::cout << "Exists = " << exists << std::endl;
+		//exists = 0;
+		if (exists == 0) {
+			std::cout << "Reach 1" << std::endl;
+			// Update Count
+			indicesNum += POLY_COUNT;
+			std::cout << "Reach 2" << std::endl;
+			// Allocate new memory
+			indices = (indexType *) realloc(indices, indicesNum * sizeof(indexType));
+			std::cout << "Reach 3" << std::endl;
+			indices[i*3 + 0] = (indexType)animVertecies[i].arrayIndex;
+			indices[i*3 + 1] = (indexType)animVertecies[i].nearest[0];
+			indices[i*3 + 2] = (indexType)animVertecies[i].nearest[1];
+			std::cout << "Reach 4" << std::endl;
+		}
 	}
-
+	/*
 	std::cout << "\n-------------------\n";
 	for (int i = 0; i < drawVerteciesNum; i++) {
 		std::cout << "X= " << drawVertecies[i].x << " Y= " << drawVertecies[i].y << "\n";
@@ -149,19 +207,23 @@ void drawPolygons(AnimationVertex * animVertecies)  {
 		if (i % 3 == 0) std::cout << std::endl;
 		std::cout << indices[i] << " ";
 	}
-
+	*/
+	std::cout << "Reach 5" << std::endl;
 	// Draw the stuf on screen
 	IndexBuffer indexBuffer(indices, indicesNum, sizeof(indexType));
-
+	std::cout << "Reach 6" << std::endl;
 	VertexBuffer vertexBuffer(drawVertecies, drawVerteciesNum);
+	std::cout << "Reach 6.5" << std::endl;
     vertexBuffer.unbind();
-
+	std::cout << "Reach 7" << std::endl;
 	vertexBuffer.bind();
 	indexBuffer.bind();
 	glDrawElements(GL_TRIANGLES, indicesNum, GL_UNSIGNED_INT, 0);
 	indexBuffer.unbind();
 	vertexBuffer.unbind();
+	std::cout << "Reach 8" << std::endl;
 
 
 
 }
+

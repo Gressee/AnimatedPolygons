@@ -81,7 +81,17 @@ void AnimationVertex::getNearest(AnimationVertex * animVertecies) {
 
         float dist = distToVertex(&animVertecies[i]);
         if (dist < farestDist) {
-            nearest[farestIndex] = animVertecies[i].arrayIndex;
+            // Check if the other vertex is already in the array
+            bool inArray = false;
+            for (int j = 0; j < POLY_COUNT - 1; j++) {
+                if (nearest[j] == animVertecies[i].arrayIndex) {
+                    inArray = true;
+                }
+            } 
+
+            if (inArray == false) {
+                nearest[farestIndex] = animVertecies[i].arrayIndex;
+            }
         }
     }
 }

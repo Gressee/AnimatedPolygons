@@ -5,5 +5,6 @@
 
 void drawVertexCirles(AnimationVertex * animVertecies);
 void drawPolygons(AnimationVertex * animVertecies);
+int polygonExists(indexType * indices, int indicesNum, indexType * newIndices);
 
 #endif

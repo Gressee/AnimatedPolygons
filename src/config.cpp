@@ -24,7 +24,7 @@ float convertY(float y) {
 }
 
 // Animation
-const int animVertexNum = 3;
+const int animVertexNum = 4;
 
 // Graphics
 int drawVerteciesPerCircle = 12; // Can't be smaler than 5 !!!
